@@ -1,11 +1,9 @@
-import { SignIn } from "@/components/SignIn";
-
-export default function Home() {
+const Home = async () => {
   return (
     <div>
       <h1>Hello World</h1>
-
-      <SignIn />
     </div>
   );
 }
+
+export default Home;

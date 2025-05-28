@@ -9,28 +9,24 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@auth/prisma-adapter": "^2.9.1",
-    "@prisma/client": "^6.8.2",
     "@radix-ui/react-slot": "^1.2.3",
     "bcryptjs": "^3.0.2",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "fullcalendar": "^6.1.17",
     "lucide-react": "^0.511.0",
+    "mongoose": "^8.15.1",
     "next": "15.3.2",
-    "next-auth": "^5.0.0-beta.28",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "resend": "^4.5.1",
-    "tailwind-merge": "^3.3.0",
-    "zustand": "^5.0.5"
+    "tailwind-merge": "^3.3.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "prisma": "^6.8.2",
     "tailwindcss": "^4",
     "tw-animate-css": "^1.3.0",
     "typescript": "^5"
