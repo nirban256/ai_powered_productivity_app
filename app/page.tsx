@@ -1,9 +1,9 @@
-import Image from "next/image";
-
-export default function Home() {
+const Home = async () => {
   return (
     <div>
       <h1>Hello World</h1>
     </div>
   );
 }
+
+export default Home;
