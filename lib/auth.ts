@@ -28,10 +28,6 @@ export const authOptions: AuthOptions = {
                     where: { email: credentials.email },
                 })
 
-                if (!user || !user.emailVerified) {
-                    return null // Block login if not verified
-                }
-
                 if (!user || !user?.hashedPassword) return null
 
                 const isValid = await compare(credentials.password, user.hashedPassword)
