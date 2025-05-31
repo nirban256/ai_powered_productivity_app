@@ -23,7 +23,7 @@ export default function SignInPage() {
             console.log(res.error);
             setError('Invalid email or password')
         } else {
-            router.push('/dashboard')
+            router.push('/auth/dashboard')
         }
     }
 

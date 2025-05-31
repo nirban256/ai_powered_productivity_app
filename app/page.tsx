@@ -2,18 +2,20 @@
 
 import React from 'react';
 import { useUserStore } from '@/lib/store/userStore';
-import Dashboard from '@/components/Dashboard';
 import Navbar from '@/components/Navbar';
 import SignIn from './auth/signin/page';
+import DashboardPage from './auth/dashboard/page';
 
 const Home = () => {
   const user = useUserStore((s) => s.user);
 
   return (
     <div>
-      <Navbar />
       {user ? (
-        <Dashboard />
+        <>
+          <Navbar />
+          <DashboardPage />
+        </>
       ) : (
         <SignIn />
       )}
