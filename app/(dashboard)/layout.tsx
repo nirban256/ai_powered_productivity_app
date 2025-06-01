@@ -4,16 +4,27 @@ import Sidebar from "@/components/Sidebar";
 import Topbar from "@/components/Topbar";
 import { useUserStore } from "@/lib/store/userStore";
 import { redirect } from "next/navigation";
+import { useEffect, useState } from "react";
 
-export default async function DashboardLayout({
+export default function DashboardLayout({
     children,
 }: {
     children: React.ReactNode;
 }) {
-    const session = useUserStore((s) => s.user);
+    const user = useUserStore((s) => s.user);
+    const [hasHydrated, setHasHydrated] = useState(false);
 
-    if (!session) {
-        redirect("/signin");
+    useEffect(() => {
+        setHasHydrated(true);
+    }, []);
+
+    // Waiting for zustand to hydrate before checking user
+    if (!hasHydrated) {
+        return null; // or a spinner
+    }
+
+    if (!user) {
+        redirect("/auth/signin");
     }
 
     return (
