@@ -35,10 +35,12 @@ model User {
 model Tasks {
   id              String    @id @default(cuid())
   title           String
-  status          Boolean?
+  status          Boolean? @default(false)
   priority        Priority @default(low)
   userId          String
   user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, id])
 }
 
 model Notes {
@@ -47,6 +49,8 @@ model Notes {
   description     String
   userId          String
   user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, id])
 }
 
 model Events {
@@ -55,4 +59,6 @@ model Events {
   date            DateTime
   userId          String
   user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, id])
 }

@@ -1,19 +1,21 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { getServerSession } from "next-auth";
+import { getCurrentUserOrThrow } from "@/lib/get-user";
 
 const POST = async (req: Request) => {
     try {
-        const session = await getServerSession();
-
-        if (!session?.user?.id) {
-            return new NextResponse("Unauthorized", { status: 401 });
-        }
+        const session = getCurrentUserOrThrow();
 
         const { title, status, priority } = await req.json();
-        if (!title) return new NextResponse("Title required for adding new task", { status: 400 });
+        if (
+            !title ||
+            (priority !== undefined && !["severe", "high", "low"].includes(priority)) ||
+            (status !== undefined && typeof status !== "boolean")
+        ) {
+            return new NextResponse("Invalid information for the fields", { status: 400 });
+        }
 
-        const user = await db.user.findMany({ where: { email: session.user.email } });
+        const user = await db.user.findMany({ where: { email: (await session).email } });
         if (!user) {
             return new NextResponse("User does not exist!", { status: 400 });
         }
@@ -22,12 +24,12 @@ const POST = async (req: Request) => {
             data: {
                 title,
                 status,
-                userId: session.user.id,
+                userId: (await session).id,
                 priority
             }
         });
 
-        return new NextResponse("Task added successfully for user " + session.user.id, { status: 201 });
+        return new NextResponse("Task added successfully for user " + (await session).id, { status: 201 });
     } catch (error) {
         console.error("Error adding task ", error);
     }
@@ -35,24 +37,10 @@ const POST = async (req: Request) => {
 
 const GET = async () => {
     try {
-        // if (process.env.NODE_ENV === 'development') {
-        //     const testUser = await db.user.findFirst({
-        //         include: { tasks: true }
-        //     });
-
-        //     if (!testUser) {
-        //         return NextResponse.json({ error: 'No test user found' }, { status: 404 });
-        //     }
-
-        //     return NextResponse.json(testUser.tasks);
-        // }
-        const session = await getServerSession();
-        if (!session?.user?.id) {
-            return new NextResponse("Unauthorized", { status: 401 });
-        }
+        const session = getCurrentUserOrThrow();
 
         const userWithTasks = await db.user.findUnique({
-            where: { email: session.user.email },
+            where: { email: (await session).email },
             include: {
                 tasks: true
             }
