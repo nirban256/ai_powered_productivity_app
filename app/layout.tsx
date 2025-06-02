@@ -4,7 +4,8 @@ import "./globals.css";
 
 import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
-import HydrateUser from '@/components/HydrateUser'
+import SessionSync from "@/components/SessionSync";
+import Providers from "./providers";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,8 +34,10 @@ export default async function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        <HydrateUser session={session} />
-        {children}
+        <Providers>
+          <SessionSync />
+          {children}
+        </Providers>
       </body>
     </html>
   );

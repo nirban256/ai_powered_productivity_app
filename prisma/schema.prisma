@@ -7,23 +7,10 @@ generator client {
   provider = "prisma-client-js"
 }
 
-
-model Account {
-  id                 String  @id @default(cuid())
-  userId             String
-  type               String
-  provider           String
-  providerAccountId  String
-  refresh_token      String? 
-  access_token       String? 
-  expires_at         Int?    
-  token_type         String? 
-  scope              String? 
-  id_token           String? 
-  session_state      String? 
-  user               User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([provider, providerAccountId])
+enum Priority {
+  severe
+  high
+  low
 }
 
 model Session {
@@ -39,6 +26,39 @@ model User {
   name           String?
   email          String?   @unique
   hashedPassword String?   // For credentials login
-  accounts       Account[]
   sessions       Session[]
+  tasks          Tasks[]
+  notes          Notes[]
+  events         Events[]
+}
+
+model Tasks {
+  id              String    @id @default(cuid())
+  title           String
+  status          Boolean? @default(false)
+  priority        Priority @default(low)
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, id])
+}
+
+model Notes {
+  id              String    @id @default(cuid())
+  title           String
+  description     String
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, id])
+}
+
+model Events {
+  id              String    @id @default(cuid())
+  title           String
+  date            DateTime
+  userId          String
+  user            User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, id])
 }

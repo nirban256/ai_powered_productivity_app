@@ -3,12 +3,14 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
+import Spinner from '@/components/Spinner';
 
 export default function SignUpPage() {
-    const router = useRouter()
-    const [form, setForm] = useState({ name: '', email: '', password: '' })
-    const [error, setError] = useState('')
-    const [success, setSuccess] = useState('')
+    const router = useRouter();
+    const [form, setForm] = useState({ name: '', email: '', password: '' });
+    const [error, setError] = useState('');
+    const [success, setSuccess] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setForm({ ...form, [e.target.name]: e.target.value })
@@ -18,24 +20,32 @@ export default function SignUpPage() {
         e.preventDefault()
         setError('')
         setSuccess('')
+        setLoading(true);
 
-        const res = await fetch('/api/register', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(form),
-        })
+        try {
+            const res = await fetch('/api/register', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(form),
+            })
 
-        if (res.status === 201) {
-            setSuccess('Account created! Redirecting...')
-            setTimeout(() => router.push('/auth/signin'), 1500)
+            if (res.status === 201) {
+                setSuccess('Account created! Redirecting...')
+                setTimeout(() => router.push('/auth/signin'), 1500)
+            }
+            else if (res.status === 409) {
+                setError('Account already exists! Redirecting...')
+                setTimeout(() => router.push('/auth/signin'), 1500)
+            }
+            else {
+                const msg = await res.text()
+                setError(msg)
+            }
+        } catch (error) {
+            console.error("Error signing up ", error);
         }
-        else if (res.status === 409) {
-            setError('Account already exists! Redirecting...')
-            setTimeout(() => router.push('/auth/signin'), 1500)
-        }
-        else {
-            const msg = await res.text()
-            setError(msg)
+        finally {
+            setLoading(false);
         }
     }
 
@@ -80,10 +90,20 @@ export default function SignUpPage() {
 
                     <Button
                         type="submit"
+                        disabled={loading}
                         className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700"
                         variant={'secondary'}
                     >
-                        Sign Up
+                        {
+                            loading ? (
+                                <>
+                                    <Spinner />
+                                    Signing up...
+                                </>
+                            ) : (
+                                "Sign Up"
+                            )
+                        }
                     </Button>
                 </form>
                 <p className="text-sm text-center mt-2">

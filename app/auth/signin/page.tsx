@@ -3,27 +3,37 @@
 import { signIn } from 'next-auth/react'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Spinner from '@/components/Spinner';
 
 export default function SignInPage() {
-    const router = useRouter()
-    const [email, setEmail] = useState('')
-    const [password, setPassword] = useState('')
-    const [error, setError] = useState('')
+    const router = useRouter();
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
+        setLoading(true);
 
-        const res = await signIn('credentials', {
-            email,
-            password,
-            redirect: false,
-        })
+        try {
+            const res = await signIn('credentials', {
+                email,
+                password,
+                redirect: false,
+            })
 
-        if (res?.error) {
-            console.log(res.error);
-            setError('Invalid email or password')
-        } else {
-            router.push('/dashboard')
+            if (res?.error) {
+                console.log(res.error);
+                setError('Invalid email or password')
+            } else {
+                router.push('/dashboard')
+            }
+        } catch (error) {
+            console.error("Error signing in ", error);
+        }
+        finally {
+            setLoading(false);
         }
     }
 
@@ -72,9 +82,19 @@ export default function SignInPage() {
                     <div>
                         <button
                             type="submit"
+                            disabled={loading}
                             className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
                         >
-                            Sign in
+                            {
+                                loading ? (
+                                    <>
+                                        <Spinner />
+                                        Signing in...
+                                    </>
+                                ) : (
+                                    "Sign In"
+                                )
+                            }
                         </button>
                     </div>
                 </form>
