@@ -87,7 +87,7 @@ const DELETE = async (
 
         await db.notes.delete({ where: { userId: (await session).id, id: id } });
 
-        return new NextResponse("Note with id " + id + " deleted successfully");
+        return new NextResponse("Note with id " + id + " deleted successfully", { status: 200 });
     } catch (error) {
         console.error("Error deleting notes", error);
     }
