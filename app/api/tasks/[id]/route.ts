@@ -47,7 +47,6 @@ const PUT = async (
 
         const { title, status, priority } = await req.json();
         if (
-            !title ||
             (priority !== undefined && !["severe", "high", "low"].includes(priority)) ||
             (status !== undefined && typeof status !== "boolean")
         ) {
