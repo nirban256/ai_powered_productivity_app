@@ -9,6 +9,7 @@ export const authOptions: AuthOptions = {
     adapter: PrismaAdapter(db),
     session: {
         strategy: 'jwt',
+        maxAge: 60 * 60 * 24
     },
     pages: {
         signIn: '/auth/signin',
@@ -52,7 +53,8 @@ export const authOptions: AuthOptions = {
         },
         async jwt({ token, user }) {
             if (user) {
-                token.id = user.id
+                token.id = user.id;
+                token.createdAt = Math.floor(Date.now() / 1000); // Current time in seconds
             }
             return token
         },
