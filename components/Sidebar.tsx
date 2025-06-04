@@ -1,12 +1,41 @@
+import { Home, LayoutList, NotebookTabs, Sparkles } from 'lucide-react'
 import React from 'react'
 
 const Sidebar = () => {
+    const menu = [
+        {
+            "display": "Dashboard",
+            "url": "/",
+            "icon": Home
+        },
+        {
+            "display": "Tasks",
+            "url": "/tasks",
+            "icon": LayoutList
+        },
+        {
+            "display": "Notes",
+            "url": "/notes",
+            "icon": NotebookTabs
+        },
+        {
+            "display": "AI Suggestion",
+            "url": "/suggestions",
+            "icon": Sparkles
+        },
+    ];
+
     return (
-        <aside className="w-64 bg-gray-100 h-full p-4 text-gray-500">
-            <nav className="space-y-4">
-                <a href="/dashboard">🏠 Dashboard</a>
-                <a href="/tasks">📝 Tasks</a>
-                <a href="/notes">📒 Notes</a>
+        <aside className="w-64 bg-gray-100 h-full  text-gray-500">
+            <nav>
+                <ul className="space-y-4 flex flex-col justify-between">
+                    {menu.map((m) => (
+                        <li key={m.url} className="flex items-center hover:bg-gray-200 p-3">
+                            <m.icon className="w-5 h-5" />
+                            <a href={m.url} className='px-1'>{m.display}</a>
+                        </li>
+                    ))}
+                </ul>
             </nav>
         </aside>
     )
