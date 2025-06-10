@@ -1,9 +1,35 @@
 import { create } from "zustand";
 
+type Task = {
+    id: string;
+    title: string;
+    status: boolean;
+    priority: string;
+    createdAt: Date;
+};
+
+type Note = {
+    id: string;
+    title: string;
+    description: string;
+    createdAt: Date;
+};
+
+type Event = {
+    id: string;
+    title: string;
+    date: Date;
+    createdAt: Date;
+};
+
 type DashboardSummary = {
-    tasks: number;
-    notes: number;
-    events: number;
+    taskLength: number;
+    noteLength: number;
+    eventLength: number;
+    tasks: Task;
+    notes: Note;
+    events: Event;
+
 };
 
 type DashboardStore = {

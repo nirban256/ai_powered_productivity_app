@@ -16,14 +16,47 @@ const GET = async (req: Request) => {
 
     if (!userWithEvents) return new NextResponse("User not found", { status: 404 });
 
-    const task = userWithEvents.tasks.filter((s) => s.status === false && s.priority === "severe");
+    const task = userWithEvents.tasks.filter((t) => t.status === false && t.priority === "severe");
     const note = userWithEvents.notes;
     const event = userWithEvents.events.filter((e) => e.date.getTime() > Date.now());
 
+    const tasks = await db.tasks.findMany({
+        where: {
+            userId: session.id,
+        },
+        orderBy: {
+            createdAt: 'desc',
+        },
+        take: 3,
+    });
+
+    const notes = await db.notes.findMany({
+        where: {
+            userId: session.id,
+        },
+        orderBy: {
+            createdAt: 'desc',
+        },
+        take: 3,
+    });
+
+    const events = await db.events.findMany({
+        where: {
+            userId: session.id,
+        },
+        orderBy: {
+            createdAt: 'desc',
+        },
+        take: 3,
+    });
+
     const data = {
-        tasks: task.length,
-        notes: note.length,
-        events: event.length
+        taskLength: task.length,
+        noteLength: note.length,
+        eventLength: event.length,
+        tasks: tasks,
+        notes: notes,
+        events: events
     }
 
     return NextResponse.json(data);

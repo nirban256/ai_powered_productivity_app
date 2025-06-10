@@ -32,7 +32,7 @@ export default function DashboardLayout({
             <Topbar />
             <div className="flex h-screen max-w-screen">
                 <Sidebar />
-                <main className="p-4 overflow-y-auto flex-1">{children}</main>
+                <main className="p-4 flex-1">{children}</main>
             </div>
         </div>
     );
