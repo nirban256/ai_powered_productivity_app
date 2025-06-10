@@ -30,9 +30,9 @@ export default function DashboardLayout({
     return (
         <div className="">
             <Topbar />
-            <div className="flex h-screen">
+            <div className="flex h-screen max-w-screen">
                 <Sidebar />
-                <main className="p-4 overflow-y-auto">{children}</main>
+                <main className="p-4 flex-1">{children}</main>
             </div>
         </div>
     );

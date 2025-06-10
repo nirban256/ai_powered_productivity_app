@@ -17,6 +17,10 @@ export async function middleware(req: NextRequest) {
         return NextResponse.next();
     }
 
+    if (pathname.startsWith('/api/auth')) {
+        return NextResponse.next()
+    }
+
     // Only protect API routes
     if (pathname.startsWith('/api')) {
         const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });

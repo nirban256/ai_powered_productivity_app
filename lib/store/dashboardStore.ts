@@ -1,19 +1,56 @@
 import { create } from "zustand";
 
-const useDashboardStore = create()(
-    (set) => ({
-        summary: null,
-        loading: false,
-        fetchSummary: async () => {
-            set({ loading: true });
-            const res = await fetch("/api/dashboard/summary");
-            const data = await res.json();
-            set({
-                summary: data,
-                loading: false
-            })
-        }
-    })
-);
+type Task = {
+    id: string;
+    title: string;
+    status: boolean;
+    priority: string;
+    createdAt: Date;
+};
 
-export { useDashboardStore };
+type Note = {
+    id: string;
+    title: string;
+    description: string;
+    createdAt: Date;
+};
+
+type Event = {
+    id: string;
+    title: string;
+    date: Date;
+    createdAt: Date;
+};
+
+type DashboardSummary = {
+    taskLength: number;
+    noteLength: number;
+    eventLength: number;
+    tasks: Task;
+    notes: Note;
+    events: Event;
+
+};
+
+type DashboardStore = {
+    summary: DashboardSummary | null;
+    loading: boolean;
+    fetchSummary: () => Promise<void>;
+};
+
+export const useDashboardStore = create<DashboardStore>()((set) => ({
+    summary: null,
+    loading: false,
+    fetchSummary: async () => {
+        try {
+            set({ loading: true });
+            const res = await fetch("/api/dashboard");
+            if (!res.ok) throw new Error("Failed to fetch dashboard data");
+            const data = await res.json();
+            set({ summary: data, loading: false });
+        } catch (error) {
+            console.error("Dashboard fetch error:", error);
+            set({ loading: false });
+        }
+    },
+}));
