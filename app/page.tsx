@@ -8,7 +8,6 @@ import DasboardPage from './(dashboard)/dashboard/page';
 
 const Home = () => {
   const user = useUserStore((s) => s.user);
-  console.log(user);
 
   return (
     <div>

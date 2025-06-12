@@ -1,16 +1,17 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getCurrentUserOrThrow } from "@/lib/get-user";
+import { redis } from "@/lib/redis";
 
 const GET = async (
     req: Request,
     { params }: { params: { id: string } }
 ) => {
     try {
-        const session = getCurrentUserOrThrow();
+        const session = await getCurrentUserOrThrow();
 
         const userWithEvents = await db.user.findUnique({
-            where: { id: (await session).id },
+            where: { id: session.id },
             include: {
                 events: true
             }
@@ -18,7 +19,7 @@ const GET = async (
         if (!userWithEvents) return new NextResponse("User not found", { status: 404 });
 
         const { id } = await params;
-        const event = await db.events.findUnique({ where: { userId: (await session).id, id: id } });
+        const event = await db.events.findUnique({ where: { userId: session.id, id: id } });
         if (!event) return new NextResponse("Invalid id", { status: 404 });
 
         return NextResponse.json(event);
@@ -32,10 +33,11 @@ const PUT = async (
     { params }: { params: { id: string } }
 ) => {
     try {
-        const session = getCurrentUserOrThrow();
+        const session = await getCurrentUserOrThrow();
+        const cacheKey = `events:${session.email}`;
 
         const userWithEvents = await db.user.findUnique({
-            where: { id: (await session).id },
+            where: { id: session.id },
             include: {
                 events: true
             }
@@ -55,7 +57,7 @@ const PUT = async (
         }
 
         const { id } = await params;
-        const event = await db.events.findUnique({ where: { userId: (await session).id, id: id } });
+        const event = await db.events.findUnique({ where: { userId: session.id, id: id } });
         if (!event) return new NextResponse("Invalid id", { status: 404 });
 
         await db.events.update({
@@ -63,9 +65,11 @@ const PUT = async (
             data: {
                 title,
                 date: parseDate,
-                userId: (await session).id
+                userId: session.id
             }
         });
+
+        await redis.del(cacheKey);
 
         return new NextResponse("Event with id " + id + " updated successfully", { status: 200 });
     } catch (error) {
@@ -78,10 +82,11 @@ const DELETE = async (
     { params }: { params: { id: string } }
 ) => {
     try {
-        const session = getCurrentUserOrThrow();
+        const session = await getCurrentUserOrThrow();
+        const cacheKey = `events:${session.email}`;
 
         const userWithEvents = await db.user.findUnique({
-            where: { id: (await session).id },
+            where: { id: session.id },
             include: {
                 events: true
             }
@@ -89,10 +94,12 @@ const DELETE = async (
         if (!userWithEvents) return new NextResponse("User not found", { status: 404 });
 
         const { id } = await params;
-        const event = await db.events.findUnique({ where: { userId: (await session).id, id: id } });
+        const event = await db.events.findUnique({ where: { userId: session.id, id: id } });
         if (!event) return new NextResponse("Invalid id", { status: 404 });
 
-        await db.events.delete({ where: { userId: (await session).id, id: id } });
+        await db.events.delete({ where: { userId: session.id, id: id } });
+
+        await redis.del(cacheKey);
 
         return new NextResponse("Event with " + id + " deleted successfully", { status: 200 });
     } catch (error) {
