@@ -1,10 +1,12 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getCurrentUserOrThrow } from "@/lib/get-user";
+import { redis } from "@/lib/redis";
 
 const POST = async (req: Request) => {
     try {
-        const session = getCurrentUserOrThrow();
+        const session = await getCurrentUserOrThrow();
+        const cacheKey = `notes:${session.email}`;
 
         const { title, description } = await req.json();
         if (
@@ -14,16 +16,18 @@ const POST = async (req: Request) => {
             return new NextResponse("Invalid information for the fields", { status: 400 });
         }
 
-        const user = await db.user.findUnique({ where: { email: (await session).email } });
+        const user = await db.user.findUnique({ where: { email: session.email } });
         if (!user) return new NextResponse("User does not exist", { status: 404 });
 
         await db.notes.create({
             data: {
                 title,
                 description,
-                userId: (await session).id
+                userId: session.id
             }
         });
+
+        await redis.del(cacheKey);
 
         return new NextResponse("Note added successfully", { status: 201 });
     } catch (error) {
@@ -33,15 +37,21 @@ const POST = async (req: Request) => {
 
 const GET = async (req: Request) => {
     try {
-        const session = getCurrentUserOrThrow();
+        const session = await getCurrentUserOrThrow();
+        const cacheKey = `notes:${session.email}`;
+
+        const cached = await redis.get(cacheKey);
+        if (typeof cached === "string") return NextResponse.json(JSON.parse(cached));
 
         const userWithNotes = await db.user.findUnique({
-            where: { email: (await session).email },
+            where: { email: session.email },
             include: {
                 notes: true
             }
         });
         if (!userWithNotes) return new NextResponse("User does not exists!", { status: 404 });
+
+        await redis.set(cacheKey, JSON.stringify(userWithNotes.notes), { ex: 300 });
 
         return NextResponse.json(userWithNotes.notes);
     } catch (error) {

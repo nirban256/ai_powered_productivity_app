@@ -1,16 +1,17 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getCurrentUserOrThrow } from "@/lib/get-user";
+import { redis } from "@/lib/redis";
 
 const GET = async (
     req: Request,
     { params }: { params: { id: string } }
 ) => {
     try {
-        const session = getCurrentUserOrThrow();
+        const session = await getCurrentUserOrThrow();
 
         const userWithNotes = await db.user.findUnique({
-            where: { email: (await session).email },
+            where: { email: session.email },
             include: {
                 notes: true
             }
@@ -18,7 +19,7 @@ const GET = async (
         if (!userWithNotes) return new NextResponse("User does not exists!", { status: 404 });
 
         const { id } = await params;
-        const notes = await db.notes.findUnique({ where: { userId: (await session).id, id: id } });
+        const notes = await db.notes.findUnique({ where: { userId: session.id, id: id } });
         if (!notes) return new NextResponse("No notes found", { status: 404 });
 
         return NextResponse.json(notes);
@@ -32,7 +33,8 @@ const PUT = async (
     { params }: { params: { id: string } }
 ) => {
     try {
-        const session = getCurrentUserOrThrow();
+        const session = await getCurrentUserOrThrow();
+        const cacheKey = `notes:${session.email}`;
 
         const { title, description } = await req.json();
         if (!title) {
@@ -40,7 +42,7 @@ const PUT = async (
         }
 
         const userWithNotes = await db.user.findUnique({
-            where: { email: (await session).email },
+            where: { email: session.email },
             include: {
                 notes: true
             }
@@ -48,7 +50,7 @@ const PUT = async (
         if (!userWithNotes) return new NextResponse("User does not exists!", { status: 404 });
 
         const { id } = await params;
-        const notes = await db.notes.findUnique({ where: { userId: (await session).id, id } });
+        const notes = await db.notes.findUnique({ where: { userId: session.id, id } });
         if (!notes) return new NextResponse("No note found with the given id", { status: 404 });
 
         await db.notes.update({
@@ -58,6 +60,8 @@ const PUT = async (
                 description
             }
         });
+
+        await redis.del(cacheKey);
 
         return new NextResponse("Note with id " + id + " updated successfully", { status: 200 });
     } catch (error) {
@@ -70,10 +74,11 @@ const DELETE = async (
     { params }: { params: { id: string } }
 ) => {
     try {
-        const session = getCurrentUserOrThrow();
+        const session = await getCurrentUserOrThrow();
+        const cacheKey = `notes:${session.email}`;
 
         const userWithNotes = await db.user.findUnique({
-            where: { email: (await session).email },
+            where: { email: session.email },
             include: {
                 notes: true
             }
@@ -81,11 +86,12 @@ const DELETE = async (
         if (!userWithNotes) return new NextResponse("User does not exist", { status: 404 });
 
         const { id } = await params;
-        const notes = await db.notes.findUnique({ where: { userId: (await session).id, id: id } });
+        const notes = await db.notes.findUnique({ where: { userId: session.id, id: id } });
 
         if (!notes) return new NextResponse("No note found with the given id", { status: 404 });
 
-        await db.notes.delete({ where: { userId: (await session).id, id: id } });
+        await db.notes.delete({ where: { userId: session.id, id: id } });
+        await redis.del(cacheKey);
 
         return new NextResponse("Note with id " + id + " deleted successfully", { status: 200 });
     } catch (error) {

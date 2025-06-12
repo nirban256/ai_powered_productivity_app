@@ -4,13 +4,13 @@ import { NextResponse } from "next/server";
 
 const POST = async (req: Request) => {
     try {
-        const session = getCurrentUserOrThrow();
+        const session = await getCurrentUserOrThrow();
 
         const { prompt } = await req.json();
 
         if (!prompt) return new NextResponse("Prompt is required", { status: 404 });
 
-        const user = await db.user.findMany({ where: { email: (await session).email } });
+        const user = await db.user.findMany({ where: { email: session.email } });
         if (!user) {
             return new NextResponse("User does not exist!", { status: 404 });
         }
@@ -62,9 +62,9 @@ const POST = async (req: Request) => {
 
 const GET = async (req: Request) => {
     try {
-        const session = getCurrentUserOrThrow();
+        const session = await getCurrentUserOrThrow();
 
-        if ((await session).email !== "nirban256@gmail.com") {
+        if (session.email !== "nirban256@gmail.com") {
             return new NextResponse("You are unauthorized", { status: 401 });
         }
 

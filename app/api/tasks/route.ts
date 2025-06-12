@@ -1,10 +1,12 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getCurrentUserOrThrow } from "@/lib/get-user";
+import { redis } from "@/lib/redis";
 
 const POST = async (req: Request) => {
     try {
-        const session = getCurrentUserOrThrow();
+        const session = await getCurrentUserOrThrow();
+        const cacheKey = `tasks:${session.email}`;
 
         const { title, status, priority } = await req.json();
         if (
@@ -15,7 +17,7 @@ const POST = async (req: Request) => {
             return new NextResponse("Invalid information for the fields", { status: 400 });
         }
 
-        const user = await db.user.findMany({ where: { email: (await session).email } });
+        const user = await db.user.findMany({ where: { email: session.email } });
         if (!user) {
             return new NextResponse("User does not exist!", { status: 400 });
         }
@@ -29,6 +31,8 @@ const POST = async (req: Request) => {
             }
         });
 
+        await redis.del(cacheKey);
+
         return new NextResponse("Task added successfully for user " + (await session).id, { status: 201 });
     } catch (error) {
         console.error("Error adding task ", error);
@@ -37,7 +41,11 @@ const POST = async (req: Request) => {
 
 const GET = async () => {
     try {
-        const session = getCurrentUserOrThrow();
+        const session = await getCurrentUserOrThrow();
+        const cacheKey = `tasks:${session.email}`;
+
+        const cached = await redis.get(cacheKey);
+        if (typeof cached === "string") return NextResponse.json(JSON.parse(cached));
 
         const userWithTasks = await db.user.findUnique({
             where: { email: (await session).email },
@@ -47,6 +55,8 @@ const GET = async () => {
         });
 
         if (!userWithTasks) return new NextResponse("User not found", { status: 404 });
+
+        await redis.set(cacheKey, JSON.stringify(userWithTasks.tasks), { ex: 300 });
 
         return NextResponse.json(userWithTasks.tasks);
     } catch (error) {

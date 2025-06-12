@@ -1,9 +1,16 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getCurrentUserOrThrow } from "@/lib/get-user";
+import { redis } from "@/lib/redis";
 
 const GET = async (req: Request) => {
     const session = await getCurrentUserOrThrow();
+    const cacheKey = `dashboard:${session.id}`;
+
+    const cached = await redis.get(cacheKey);
+    if (cached) {
+        return NextResponse.json(cached);
+    }
 
     const userWithEvents = await db.user.findUnique({
         where: { email: (await session).email },
@@ -58,6 +65,8 @@ const GET = async (req: Request) => {
         notes: notes,
         events: events
     }
+
+    await redis.set(cacheKey, data, { ex: 300 });
 
     return NextResponse.json(data);
 }

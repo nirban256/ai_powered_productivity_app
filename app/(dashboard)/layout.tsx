@@ -1,7 +1,9 @@
 "use client"
 
 import Sidebar from "@/components/Sidebar";
+import Spinner from "@/components/Spinner";
 import Topbar from "@/components/Topbar";
+import { useDashboardStore } from "@/lib/store/dashboardStore";
 import { useUserStore } from "@/lib/store/userStore";
 import { redirect } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -20,7 +22,7 @@ export default function DashboardLayout({
 
     // Waiting for zustand to hydrate before checking user
     if (!hasHydrated) {
-        return null; // or a spinner
+        return <Spinner />; // or a spinner
     }
 
     if (!user) {
@@ -30,7 +32,7 @@ export default function DashboardLayout({
     return (
         <div className="">
             <Topbar />
-            <div className="flex h-screen max-w-screen">
+            <div className="flex max-w-screen">
                 <Sidebar />
                 <main className="p-4 flex-1">{children}</main>
             </div>

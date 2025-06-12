@@ -1,15 +1,16 @@
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getCurrentUserOrThrow } from "@/lib/get-user";
+import { redis } from "@/lib/redis";
 
 const GET = async (
     req: Request,
     { params }: { params: { id: string } }) => {
     try {
-        const session = getCurrentUserOrThrow();
+        const session = await getCurrentUserOrThrow();
 
         const userWithTasks = await db.user.findUnique({
-            where: { id: (await session).id },
+            where: { id: session.id },
             include: {
                 tasks: true
             }
@@ -17,7 +18,7 @@ const GET = async (
         if (!userWithTasks) return new NextResponse("User not found", { status: 404 });
 
         const { id } = await params;
-        const task = await db.tasks.findFirst({ where: { userId: (await session).id, id: id } });
+        const task = await db.tasks.findFirst({ where: { userId: session.id, id: id } });
         if (!task) return new NextResponse("Invalid id", { status: 404 });
 
         return NextResponse.json(task);
@@ -31,10 +32,11 @@ const PUT = async (
     { params }: { params: { id: string } }
 ) => {
     try {
-        const session = getCurrentUserOrThrow();
+        const session = await getCurrentUserOrThrow();
+        const cacheKey = `tasks:${session.email}`;
 
         const userWithTasks = await db.user.findUnique({
-            where: { id: (await session).id },
+            where: { id: session.id },
             include: {
                 tasks: true
             }
@@ -42,7 +44,7 @@ const PUT = async (
         if (!userWithTasks) return new NextResponse("User not found", { status: 404 });
 
         const { id } = await params;
-        const task = await db.tasks.findUnique({ where: { userId: (await session).id, id: id } });
+        const task = await db.tasks.findUnique({ where: { userId: session.id, id: id } });
         if (!task) return new NextResponse("Invalid id", { status: 404 });
 
         const { title, status, priority } = await req.json();
@@ -62,6 +64,8 @@ const PUT = async (
             }
         });
 
+        await redis.del(cacheKey);
+
         return new NextResponse("Task with id " + id + " updated successfully", { status: 200 });
     } catch (error) {
         console.error("Error updating task", error);
@@ -73,10 +77,11 @@ const DELETE = async (
     { params }: { params: { id: string } }
 ) => {
     try {
-        const session = getCurrentUserOrThrow();
+        const session = await getCurrentUserOrThrow();
+        const cacheKey = `tasks:${session.email}`;
 
         const userWithTasks = await db.user.findUnique({
-            where: { id: (await session).id },
+            where: { id: session.id },
             include: {
                 tasks: true
             }
@@ -84,10 +89,12 @@ const DELETE = async (
         if (!userWithTasks) return new NextResponse("User not found", { status: 404 });
 
         const { id } = await params;
-        const task = await db.tasks.findUnique({ where: { userId: (await session).id, id: id } });
+        const task = await db.tasks.findUnique({ where: { userId: session.id, id: id } });
         if (!task) return new NextResponse("Invalid id", { status: 404 });
 
-        await db.tasks.delete({ where: { userId: (await session).id, id: id } });
+        await db.tasks.delete({ where: { userId: session.id, id: id } });
+
+        await redis.del(cacheKey);
 
         return new NextResponse("Task with " + id + " deleted successfully", { status: 200 });
     } catch (error) {
