@@ -3,7 +3,6 @@
 import Sidebar from "@/components/Sidebar";
 import Spinner from "@/components/Spinner";
 import Topbar from "@/components/Topbar";
-import { useDashboardStore } from "@/lib/store/dashboardStore";
 import { useUserStore } from "@/lib/store/userStore";
 import { redirect } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -22,7 +21,7 @@ export default function DashboardLayout({
 
     // Waiting for zustand to hydrate before checking user
     if (!hasHydrated) {
-        return <Spinner />; // or a spinner
+        return <Spinner />;
     }
 
     if (!user) {

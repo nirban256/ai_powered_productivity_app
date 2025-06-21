@@ -28,7 +28,7 @@ const DasboardPage = () => {
             {user && (
                 <AnimatePresence mode="wait">
                     {loading || !summary ? (
-                        <WelcomeAnimation key="welcome" />
+                        <WelcomeAnimation key="welcome" text="Welcome Back!" />
                     ) : (
                         <motion.div
                             key="dashboard"

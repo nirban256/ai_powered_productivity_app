@@ -3,7 +3,11 @@
 import { motion } from "framer-motion";
 import { Loader2 } from "lucide-react";
 
-const WelcomeAnimation = () => {
+interface WelcomeAnimationProps {
+    text: string;
+}
+
+const WelcomeAnimation = ({ text }: WelcomeAnimationProps) => {
     return (
         <motion.div
             className="flex flex-col items-center justify-center h-screen bg-background"
@@ -18,7 +22,7 @@ const WelcomeAnimation = () => {
                 animate={{ y: 0 }}
                 transition={{ duration: 0.6 }}
             >
-                Welcome back!
+                {text}
             </motion.h1>
             <Loader2 className="w-8 h-8 text-muted-foreground animate-spin" />
         </motion.div>
