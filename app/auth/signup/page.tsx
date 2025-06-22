@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
-import Spinner from '@/components/Spinner';
+import { Loader2 } from 'lucide-react';
 
 export default function SignUpPage() {
     const router = useRouter();
@@ -97,7 +97,7 @@ export default function SignUpPage() {
                         {
                             loading ? (
                                 <>
-                                    <Spinner />
+                                    <Loader2 className="w-4 h-4 animate-spin" />
                                     Signing up...
                                 </>
                             ) : (

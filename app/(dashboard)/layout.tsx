@@ -1,9 +1,9 @@
 "use client"
 
 import Sidebar from "@/components/Sidebar";
-import Spinner from "@/components/Spinner";
 import Topbar from "@/components/Topbar";
 import { useUserStore } from "@/lib/store/userStore";
+import { Loader2 } from "lucide-react";
 import { redirect } from "next/navigation";
 import { useEffect, useState } from "react";
 
@@ -21,7 +21,7 @@ export default function DashboardLayout({
 
     // Waiting for zustand to hydrate before checking user
     if (!hasHydrated) {
-        return <Spinner />;
+        return <Loader2 className="w-4 h-4 animate-spin" />;
     }
 
     if (!user) {

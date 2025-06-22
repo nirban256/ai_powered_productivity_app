@@ -3,7 +3,7 @@
 import { signIn } from 'next-auth/react'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import Spinner from '@/components/Spinner';
+import { Loader2 } from 'lucide-react';
 
 export default function SignInPage() {
     const router = useRouter();
@@ -88,7 +88,7 @@ export default function SignInPage() {
                             {
                                 loading ? (
                                     <>
-                                        <Spinner />
+                                        <Loader2 className="w-4 h-4 animate-spin" />
                                         Signing in...
                                     </>
                                 ) : (

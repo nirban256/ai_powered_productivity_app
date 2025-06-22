@@ -1,6 +1,5 @@
 "use client";
 
-import Spinner from '@/components/Spinner';
 import { useDashboardStore } from '@/lib/store/dashboardStore';
 import { useUserStore } from '@/lib/store/userStore';
 import { useEffect } from 'react';
@@ -13,6 +12,7 @@ import {
 } from "@/components/ui/card";
 import { motion, AnimatePresence } from "framer-motion";
 import WelcomeAnimation from '@/components/Welcome';
+import { Loader2 } from 'lucide-react';
 
 const DasboardPage = () => {
     const user = useUserStore((s) => s.user);
@@ -44,7 +44,7 @@ const DasboardPage = () => {
 
                             <div className="pt-12">
                                 {loading ? (
-                                    <Spinner color="text-blue-600" size="h-8 w-8" />
+                                    <Loader2 className="w-4 h-4 animate-spin" />
                                 ) : (
                                     <ul className='flex justify-between items-center'>
                                         <li>
@@ -68,7 +68,7 @@ const DasboardPage = () => {
                                 <div>
                                     {
                                         loading ? (
-                                            <Spinner color="text-blue-600" size="h-8 w-8" />
+                                            <Loader2 className="w-4 h-4 animate-spin" />
                                         ) : (
                                             Array.isArray(summary?.tasks) && summary.tasks.length > 0 && (
                                                 <>
@@ -90,7 +90,7 @@ const DasboardPage = () => {
                                 <div>
                                     {
                                         loading ? (
-                                            <Spinner color="text-blue-600" size="h-8 w-8" />
+                                            <Loader2 className="w-4 h-4 animate-spin" />
                                         ) : (
                                             Array.isArray(summary?.notes) && summary.noteLength > 0 && (
                                                 <>
@@ -111,7 +111,7 @@ const DasboardPage = () => {
                                 <div>
                                     {
                                         loading ? (
-                                            <Spinner color="text-blue-600" size="h-8 w-8" />
+                                            <Loader2 className="w-4 h-4 animate-spin" />
                                         ) : (
                                             Array.isArray(summary?.events) && summary.events.length > 0 && (
                                                 <>

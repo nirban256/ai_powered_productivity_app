@@ -1,4 +1,4 @@
-import { Home, LayoutList, NotebookTabs, Sparkles } from 'lucide-react'
+import { Home, LayoutList, NotebookTabs, Sparkles, CalendarClockIcon } from 'lucide-react'
 import React from 'react'
 
 const Sidebar = () => {
@@ -17,6 +17,11 @@ const Sidebar = () => {
             "display": "Notes",
             "url": "/notes",
             "icon": NotebookTabs
+        },
+        {
+            "display": "Events",
+            "url": "/events",
+            "icon": CalendarClockIcon
         },
         {
             "display": "AI Suggestion",
