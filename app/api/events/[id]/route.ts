@@ -3,28 +3,39 @@ import { db } from "@/lib/db";
 import { getCurrentUserOrThrow } from "@/lib/get-user";
 import { redis } from "@/lib/redis";
 
-const GET = async (
+export async function GET(
     req: Request,
-    { params }: { params: { id: string } }
-) => {
+    context: { params: { id: string } }
+) {
     try {
         const session = await getCurrentUserOrThrow();
 
         const userWithEvents = await db.user.findUnique({
             where: { id: session.id },
-            include: {
-                events: true
+            include: { events: true }
+        });
+
+        if (!userWithEvents) {
+            return new NextResponse("User not found", { status: 404 });
+        }
+
+        const { id } = context.params;
+
+        const event = await db.events.findUnique({
+            where: {
+                userId: session.id,
+                id: id
             }
         });
-        if (!userWithEvents) return new NextResponse("User not found", { status: 404 });
 
-        const { id } = await params;
-        const event = await db.events.findUnique({ where: { userId: session.id, id: id } });
-        if (!event) return new NextResponse("Invalid id", { status: 404 });
+        if (!event) {
+            return new NextResponse("Invalid id", { status: 404 });
+        }
 
         return NextResponse.json(event);
     } catch (error) {
         console.error("Error fetching the event by id", error);
+        return new NextResponse("Internal Server Error", { status: 500 });
     }
 }
 
@@ -107,4 +118,4 @@ const DELETE = async (
     }
 }
 
-export { GET, PUT, DELETE };
+export { PUT, DELETE };
