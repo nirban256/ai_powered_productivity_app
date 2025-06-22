@@ -56,12 +56,6 @@ const TasksPage = () => {
         }
     }
 
-    if (task === null) return (
-        <h1 className='text-4xl font-semibold'>
-            Get started by setting your first task
-        </h1>
-    );
-
     useEffect(() => {
         getTasks();
     }, [])
@@ -81,9 +75,15 @@ const TasksPage = () => {
                         exit={{ opacity: 0 }}
                         transition={{ duration: 0.5 }}
                     >
-                        <h1 className="text-4xl font-semibold">
-                            All your tasks at one place
-                        </h1>
+                        {Array.isArray(task) && task.length > 0 ? (
+                            <h1 className="text-4xl font-semibold">
+                                All your tasks at one place
+                            </h1>
+                        ) : (
+                            <h1 className='text-4xl font-semibold'>
+                                Get started by setting your first task
+                            </h1>
+                        )}
 
                         <TaskModal onTaskCreated={getTasks} />
 
