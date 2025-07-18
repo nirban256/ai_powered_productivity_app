@@ -1,11 +1,10 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getCurrentUserOrThrow } from "@/lib/get-user";
 import { redis } from "@/lib/redis";
 
 export async function GET(
-    req: Request,
-    { params }: { params: { id: string } }) {
+    req: NextRequest) {
     try {
         const session = await getCurrentUserOrThrow();
 
@@ -17,7 +16,7 @@ export async function GET(
         });
         if (!userWithTasks) return new NextResponse("User not found", { status: 404 });
 
-        const { id } = await params;
+        const id = req.nextUrl.pathname.split("/").pop();
         const task = await db.tasks.findFirst({ where: { userId: session.id, id: id } });
         if (!task) return new NextResponse("Invalid id", { status: 404 });
 
@@ -28,8 +27,7 @@ export async function GET(
 }
 
 export async function PUT(
-    req: Request,
-    { params }: { params: { id: string } }
+    req: NextRequest
 ) {
     try {
         const session = await getCurrentUserOrThrow();
@@ -43,7 +41,7 @@ export async function PUT(
         });
         if (!userWithTasks) return new NextResponse("User not found", { status: 404 });
 
-        const { id } = await params;
+        const id = req.nextUrl.pathname.split("/").pop();
         const task = await db.tasks.findUnique({ where: { userId: session.id, id: id } });
         if (!task) return new NextResponse("Invalid id", { status: 404 });
 
@@ -73,8 +71,7 @@ export async function PUT(
 }
 
 export async function DELETE(
-    req: Request,
-    { params }: { params: { id: string } }
+    req: NextRequest
 ) {
     try {
         const session = await getCurrentUserOrThrow();
@@ -88,7 +85,7 @@ export async function DELETE(
         });
         if (!userWithTasks) return new NextResponse("User not found", { status: 404 });
 
-        const { id } = await params;
+        const id = req.nextUrl.pathname.split("/").pop();
         const task = await db.tasks.findUnique({ where: { userId: session.id, id: id } });
         if (!task) return new NextResponse("Invalid id", { status: 404 });
 

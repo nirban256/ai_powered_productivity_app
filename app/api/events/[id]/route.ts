@@ -1,11 +1,10 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getCurrentUserOrThrow } from "@/lib/get-user";
 import { redis } from "@/lib/redis";
 
 export async function GET(
-    req: Request,
-    context: { params: { id: string } }
+    req: NextRequest
 ) {
     try {
         const session = await getCurrentUserOrThrow();
@@ -19,7 +18,7 @@ export async function GET(
             return new NextResponse("User not found", { status: 404 });
         }
 
-        const { id } = context.params;
+        const id = req.nextUrl.pathname.split("/").pop();
 
         const event = await db.events.findUnique({
             where: {
@@ -40,8 +39,7 @@ export async function GET(
 }
 
 export async function PUT(
-    req: Request,
-    { params }: { params: { id: string } }
+    req: NextRequest
 ) {
     try {
         const session = await getCurrentUserOrThrow();
@@ -67,7 +65,7 @@ export async function PUT(
             return new NextResponse("Date and time cannot be before than current date or time", { status: 400 });
         }
 
-        const { id } = await params;
+        const id = req.nextUrl.pathname.split("/").pop();
         const event = await db.events.findUnique({ where: { userId: session.id, id: id } });
         if (!event) return new NextResponse("Invalid id", { status: 404 });
 
@@ -89,8 +87,7 @@ export async function PUT(
 }
 
 export async function DELETE(
-    req: Request,
-    { params }: { params: { id: string } }
+    req: NextRequest
 ) {
     try {
         const session = await getCurrentUserOrThrow();
@@ -104,7 +101,7 @@ export async function DELETE(
         });
         if (!userWithEvents) return new NextResponse("User not found", { status: 404 });
 
-        const { id } = await params;
+        const id = req.nextUrl.pathname.split("/").pop();
         const event = await db.events.findUnique({ where: { userId: session.id, id: id } });
         if (!event) return new NextResponse("Invalid id", { status: 404 });
 
