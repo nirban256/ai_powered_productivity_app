@@ -1,11 +1,10 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getCurrentUserOrThrow } from "@/lib/get-user";
 import { redis } from "@/lib/redis";
 
 export async function GET(
-    req: Request,
-    { params }: { params: { id: string } }
+    req: NextRequest
 ) {
     try {
         const session = await getCurrentUserOrThrow();
@@ -19,7 +18,7 @@ export async function GET(
             return new NextResponse("User not found", { status: 404 });
         }
 
-        const { id } = params;
+        const id = req.nextUrl.pathname.split("/").pop();
 
         const event = await db.events.findUnique({
             where: {
