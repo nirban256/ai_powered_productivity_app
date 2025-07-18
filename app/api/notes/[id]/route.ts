@@ -1,11 +1,10 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
 import { getCurrentUserOrThrow } from "@/lib/get-user";
 import { redis } from "@/lib/redis";
 
 export async function GET(
-    req: Request,
-    { params }: { params: { id: string } }
+    req: NextRequest
 ) {
     try {
         const session = await getCurrentUserOrThrow();
@@ -18,7 +17,7 @@ export async function GET(
         });
         if (!userWithNotes) return new NextResponse("User does not exists!", { status: 404 });
 
-        const { id } = await params;
+        const id = req.nextUrl.pathname.split("/").pop();
         const notes = await db.notes.findUnique({ where: { userId: session.id, id: id } });
         if (!notes) return new NextResponse("No notes found", { status: 404 });
 
@@ -29,8 +28,7 @@ export async function GET(
 }
 
 export async function PUT(
-    req: Request,
-    { params }: { params: { id: string } }
+    req: NextRequest
 ) {
     try {
         const session = await getCurrentUserOrThrow();
@@ -49,7 +47,7 @@ export async function PUT(
         });
         if (!userWithNotes) return new NextResponse("User does not exists!", { status: 404 });
 
-        const { id } = await params;
+        const id = req.nextUrl.pathname.split("/").pop();
         const notes = await db.notes.findUnique({ where: { userId: session.id, id } });
         if (!notes) return new NextResponse("No note found with the given id", { status: 404 });
 
@@ -70,8 +68,7 @@ export async function PUT(
 }
 
 export async function DELETE(
-    req: Request,
-    { params }: { params: { id: string } }
+    req: NextRequest
 ) {
     try {
         const session = await getCurrentUserOrThrow();
@@ -85,7 +82,7 @@ export async function DELETE(
         });
         if (!userWithNotes) return new NextResponse("User does not exist", { status: 404 });
 
-        const { id } = await params;
+        const id = req.nextUrl.pathname.split("/").pop();
         const notes = await db.notes.findUnique({ where: { userId: session.id, id: id } });
 
         if (!notes) return new NextResponse("No note found with the given id", { status: 404 });
