@@ -2,7 +2,7 @@ import { db } from "@/lib/db";
 import { getCurrentUserOrThrow } from "@/lib/get-user";
 import { NextResponse } from "next/server";
 
-const POST = async (req: Request) => {
+export async function POST(req: Request) {
     try {
         const session = await getCurrentUserOrThrow();
 
@@ -60,7 +60,7 @@ const POST = async (req: Request) => {
     }
 }
 
-const GET = async (req: Request) => {
+export async function GET(req: Request) {
     try {
         const session = await getCurrentUserOrThrow();
 
@@ -76,5 +76,3 @@ const GET = async (req: Request) => {
         return new NextResponse("Internal Server Error", { status: 500 });
     }
 }
-
-export { POST, GET };

@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 import { getCurrentUserOrThrow } from "@/lib/get-user";
 import { redis } from "@/lib/redis";
 
-const POST = async (req: Request) => {
+export async function POST(req: Request) {
     try {
         const session = await getCurrentUserOrThrow();
         const cacheKey = `tasks:${session.email}`;
@@ -39,7 +39,7 @@ const POST = async (req: Request) => {
     }
 }
 
-const GET = async () => {
+export async function GET() {
     try {
         const session = await getCurrentUserOrThrow();
         const cacheKey = `tasks:${session.email}`;
@@ -63,5 +63,3 @@ const GET = async () => {
         console.error("Error getting all the tasks", error);
     }
 }
-
-export { POST, GET };

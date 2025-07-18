@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 import { getCurrentUserOrThrow } from "@/lib/get-user";
 import { redis } from "@/lib/redis";
 
-const GET = async (req: Request) => {
+export async function GET(req: Request) {
     const session = await getCurrentUserOrThrow();
     const cacheKey = `dashboard:${session.id}`;
 
@@ -70,5 +70,3 @@ const GET = async (req: Request) => {
 
     return NextResponse.json(data);
 }
-
-export { GET };
