@@ -21,6 +21,12 @@ export async function middleware(req: NextRequest) {
         return NextResponse.next()
     }
 
+    const PUBLIC_API_ROUTES = ['/api/register', '/api/signup'];
+
+    if (PUBLIC_API_ROUTES.includes(pathname)) {
+        return NextResponse.next();
+    }
+
     // Only protect API routes
     if (pathname.startsWith('/api')) {
         const token = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });

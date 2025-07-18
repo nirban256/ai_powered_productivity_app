@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Button } from '@/components/ui/button'
 import { Loader2 } from 'lucide-react';
+import Link from 'next/link';
 
 export default function SignUpPage() {
     const router = useRouter();
@@ -58,7 +59,7 @@ export default function SignUpPage() {
                 >
                     <h2 className="text-2xl font-semibold text-center">Create an account</h2>
 
-                    {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+                    {error && <p className="text-red-500 text-sm text-center">Error signing up</p>}
                     {success && <p className="text-green-500 text-sm text-center">{success}</p>}
 
                     <input
@@ -90,16 +91,18 @@ export default function SignUpPage() {
 
                     <Button
                         type="submit"
+                        aria-busy={loading}
+                        aria-disabled={loading}
                         disabled={loading}
                         className="w-full bg-blue-600 text-white py-2 rounded-md hover:bg-blue-700"
                         variant={'secondary'}
                     >
                         {
                             loading ? (
-                                <>
+                                <div className='flex items-center justify-center gap-2'>
                                     <Loader2 className="w-4 h-4 animate-spin" />
                                     Signing up...
-                                </>
+                                </div>
                             ) : (
                                 "Sign Up"
                             )
@@ -108,9 +111,9 @@ export default function SignUpPage() {
                 </form>
                 <p className="text-sm text-center mt-2">
                     Already have an account?{' '}
-                    <a href="/auth/signin" className="text-blue-600 underline">
+                    <Link href="/auth/signin" className="text-blue-600 underline">
                         Sign in
-                    </a>
+                    </Link>
                 </p>
             </div>
         </div>
