@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 import { getCurrentUserOrThrow } from "@/lib/get-user";
 import { redis } from "@/lib/redis";
 
-const GET = async (req: Request) => {
+export async function GET(req: Request) {
     const session = await getCurrentUserOrThrow();
     const cacheKey = `events:${session.email}`;
 
@@ -24,7 +24,7 @@ const GET = async (req: Request) => {
     return NextResponse.json(userWithEvents.events);
 }
 
-const POST = async (req: Request) => {
+export async function POST(req: Request) {
     try {
         const session = await getCurrentUserOrThrow();
         const cacheKey = `events:${session.email}`;
@@ -61,5 +61,3 @@ const POST = async (req: Request) => {
         console.error("Error adding events", error);
     }
 }
-
-export { GET, POST };

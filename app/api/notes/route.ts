@@ -3,7 +3,7 @@ import { db } from "@/lib/db";
 import { getCurrentUserOrThrow } from "@/lib/get-user";
 import { redis } from "@/lib/redis";
 
-const POST = async (req: Request) => {
+export async function POST(req: Request) {
     try {
         const session = await getCurrentUserOrThrow();
         const cacheKey = `notes:${session.email}`;
@@ -35,7 +35,7 @@ const POST = async (req: Request) => {
     }
 }
 
-const GET = async (req: Request) => {
+export async function GET(req: Request) {
     try {
         const session = await getCurrentUserOrThrow();
         const cacheKey = `notes:${session.email}`;
@@ -58,5 +58,3 @@ const GET = async (req: Request) => {
         console.error("Error fetching all the notes", error);
     }
 }
-
-export { POST, GET };

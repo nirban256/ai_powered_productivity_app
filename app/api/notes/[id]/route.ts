@@ -3,10 +3,10 @@ import { db } from "@/lib/db";
 import { getCurrentUserOrThrow } from "@/lib/get-user";
 import { redis } from "@/lib/redis";
 
-const GET = async (
+export async function GET(
     req: Request,
     { params }: { params: { id: string } }
-) => {
+) {
     try {
         const session = await getCurrentUserOrThrow();
 
@@ -28,10 +28,10 @@ const GET = async (
     }
 }
 
-const PUT = async (
+export async function PUT(
     req: Request,
     { params }: { params: { id: string } }
-) => {
+) {
     try {
         const session = await getCurrentUserOrThrow();
         const cacheKey = `notes:${session.email}`;
@@ -69,10 +69,10 @@ const PUT = async (
     }
 }
 
-const DELETE = async (
+export async function DELETE(
     req: Request,
     { params }: { params: { id: string } }
-) => {
+) {
     try {
         const session = await getCurrentUserOrThrow();
         const cacheKey = `notes:${session.email}`;
@@ -98,5 +98,3 @@ const DELETE = async (
         console.error("Error deleting notes", error);
     }
 }
-
-export { GET, PUT, DELETE };
