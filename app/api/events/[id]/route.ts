@@ -5,7 +5,7 @@ import { redis } from "@/lib/redis";
 
 export async function GET(
     req: Request,
-    context: { params: { id: string } }
+    { params }: { params: { id: string } }
 ) {
     try {
         const session = await getCurrentUserOrThrow();
@@ -19,7 +19,7 @@ export async function GET(
             return new NextResponse("User not found", { status: 404 });
         }
 
-        const { id } = context.params;
+        const { id } = params;
 
         const event = await db.events.findUnique({
             where: {
