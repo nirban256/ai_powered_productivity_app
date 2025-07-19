@@ -26,9 +26,9 @@ type DashboardSummary = {
     taskLength: number;
     noteLength: number;
     eventLength: number;
-    tasks: Task;
-    notes: Note;
-    events: Event;
+    tasks: Task[];
+    notes: Note[];
+    events: Event[];
 
 };
 
