@@ -23,9 +23,9 @@ export async function GET(req: Request) {
 
     if (!userWithEvents) return new NextResponse("User not found", { status: 404 });
 
-    const task = userWithEvents.tasks.filter((t) => t.status === false && t.priority === "severe");
+    const task = userWithEvents.tasks.filter((t: any) => t.status === false && t.priority === "severe");
     const note = userWithEvents.notes;
-    const event = userWithEvents.events.filter((e) => e.date.getTime() > Date.now());
+    const event = userWithEvents.events.filter((e: any) => e.date.getTime() > Date.now());
 
     const tasks = await db.tasks.findMany({
         where: {
