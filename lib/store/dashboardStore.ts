@@ -1,3 +1,4 @@
+import toast from "react-hot-toast";
 import { create } from "zustand";
 
 type Task = {
@@ -48,8 +49,10 @@ export const useDashboardStore = create<DashboardStore>()((set) => ({
             if (!res.ok) throw new Error("Failed to fetch dashboard data");
             const data = await res.json();
             set({ summary: data, loading: false });
+            toast.success("Fetched the user data");
         } catch (error) {
             console.error("Dashboard fetch error:", error);
+            toast.error("Error fetching user data");
             set({ loading: false });
         }
     },
