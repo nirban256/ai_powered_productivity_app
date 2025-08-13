@@ -9,6 +9,7 @@ import { useUserStore } from '@/lib/store/userStore';
 import { AnimatePresence, motion } from 'framer-motion';
 import { redirect } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
+import toast from 'react-hot-toast';
 
 type Task = {
     id: string;
@@ -31,7 +32,12 @@ const TasksPage = () => {
             try {
                 setLoading(true);
                 const tasks = await fetch("/api/tasks");
-                if (!tasks.ok) (<h1 className='text-4xl font-semibold'>Failed to fetch the tasks</h1>);
+                if (!tasks.ok) (
+                    <>
+                        <h1 className='text-4xl font-semibold'>Failed to fetch the tasks</h1>
+                        toast.error("Error fetching tasks")
+                    </>
+                );
                 const data = await tasks.json();
                 seTask(data);
                 setLoading(false);

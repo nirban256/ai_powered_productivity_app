@@ -7,7 +7,7 @@ const Topbar = () => {
     const user = useUserStore(s => s.user);
 
     return (
-        <header className="w-full bg-white shadow p-4">
+        <header className="w-full shadow p-4">
             <nav>
                 <ul className="flex justify-between items-center">
                     <li>

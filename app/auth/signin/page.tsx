@@ -4,6 +4,7 @@ import { signIn } from 'next-auth/react'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { Loader2 } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 export default function SignInPage() {
     const router = useRouter();
@@ -25,9 +26,10 @@ export default function SignInPage() {
 
             if (res?.error) {
                 console.log(res.error);
-                setError('Invalid email or password')
+                toast.error("Invalid Email or Password");
             } else {
-                router.push('/dashboard')
+                toast.success("Login successfull");
+                router.push('/dashboard');
             }
         } catch (error) {
             console.error("Error signing in ", error);
@@ -38,8 +40,8 @@ export default function SignInPage() {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-100">
-            <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-2xl shadow-xl">
+        <div className="min-h-screen flex items-center justify-center">
+            <div className="w-full max-w-md p-8 space-y-6  rounded-2xl shadow-xl">
                 <h2 className="text-center text-3xl font-bold text-gray-900">
                     Sign in to your account
                 </h2>
