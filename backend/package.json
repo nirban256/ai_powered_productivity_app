@@ -1,0 +1,35 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "Aether app's backend",
+  "keywords": [
+    "Full-stack",
+    "JavaScript",
+    "React.js",
+    "Node.js"
+  ],
+  "homepage": "https://github.com/nirban256/aether-ai-powered-productivity-app#readme",
+  "bugs": {
+    "url": "https://github.com/nirban256/aether-ai-powered-productivity-app/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nirban256/aether-ai-powered-productivity-app.git"
+  },
+  "license": "ISC",
+  "author": "Nirban Chakraborty",
+  "type": "module",
+  "main": "src/app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node src/app.js",
+    "dev": "nodemon start src/app.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.1",
+    "express": "^5.1.0",
+    "mongoose": "^8.18.0",
+    "nodemon": "^3.1.10"
+  }
+}
